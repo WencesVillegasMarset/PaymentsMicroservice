@@ -1,0 +1,7 @@
+{
+    "name": "Payments Service",
+    "version": "0.1.0",
+    "description": "Microservicio de Payments en Python, para ejemplo ecommerce",
+    "title": "Payments Microservice",
+    "url" : ""
+  }
