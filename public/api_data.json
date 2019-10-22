@@ -1,5 +1,33 @@
 [
   {
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "optional": false,
+            "field": "varname1",
+            "description": "<p>No type.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "varname2",
+            "description": "<p>With type.</p>"
+          }
+        ]
+      }
+    },
+    "type": "",
+    "url": "",
+    "version": "0.0.0",
+    "filename": "./public/main.js",
+    "group": "C__Users_Jorge_Documents_repos_payments_service_public_main_js",
+    "groupTitle": "C__Users_Jorge_Documents_repos_payments_service_public_main_js",
+    "name": ""
+  },
+  {
     "type": "fanout",
     "url": "auth/logout",
     "title": "Logout",
@@ -8,7 +36,7 @@
     "examples": [
       {
         "title": "Mensaje",
-        "content": "{\n  \"type\": \"article-exist\",\n  \"message\" : \"tokenId\"\n}",
+        "content": "{\n  \"type\": \"logout\",\n  \"message\" : \"tokenId\"\n}",
         "type": "json"
       }
     ],

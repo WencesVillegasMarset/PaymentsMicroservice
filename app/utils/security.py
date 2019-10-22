@@ -21,7 +21,7 @@ memo = memoize.Memoizer(memoKeys)
 
 @apiErrorExample 401 Unauthorized
     HTTP/1.1 401 Unauthorized
- """
+"""
 
 
 @memo(max_age=3600)
@@ -72,3 +72,7 @@ def invalidateSession(token):
     if (isinstance(token, str) and isValidToken.exists((token, ))):
         print("Key eliminada %r" % token)
         isValidToken.delete((token, ))
+
+
+if __name__ == "__main__":
+    print(isValidToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNWRhZGIyZmU5ZWQ3NWYzZmNjNjQwZGQzIiwidG9rZW5faWQiOiI1ZGFlNmYwOTE0Nzg0MDM5Y2MzOGQ5YzgiLCJpYXQiOjE1NzE3MTI3Nzd9.KyHXpq_xFS5kx9w0eBU8ALX_NB0FDbaOwRUsejfOXng'))

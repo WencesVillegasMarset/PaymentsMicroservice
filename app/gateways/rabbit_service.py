@@ -57,6 +57,8 @@ def init():
     """
     initAuth()
     initPayments()
+    initTransactions()
+    
 
 
 def initAuth():
@@ -71,9 +73,14 @@ def initPayments():
     """
     Inicializa RabbitMQ para enviar eventos acerca de payments.
     """
-    catalogConsumer = threading.Thread(target=listenPayments)
-    catalogConsumer.start()
-
+    paymentsProducer = threading.Thread(target=postPayments)
+    paymentsProducer.start()
+def initTransactions():
+    """
+    Inicializa RabbitMQ para publicar y recibir mensajes acerca de transacciones.
+    """
+    paymentsProducer = threading.Thread(target=listenTransactions)
+    paymentsProducer.start()
 
 def listenAuth():
     """
@@ -87,7 +94,7 @@ def listenAuth():
 
     @apiExample {json} Mensaje
       {
-        "type": "article-exist",
+        "type": "logout",
         "message" : "tokenId"
       }
     """
@@ -123,8 +130,50 @@ def listenAuth():
         print("RabbitMQ Auth desconectado, intentando reconectar en 10'")
         threading.Timer(10.0, initAuth).start()
 
-# TODO : Terminar Rabbit aprendiendo de la documentacion
-def listenPayments():
+
+def listenTransactions():
+    """
+    Escucha a transacciones a procesar emitidas por adaptadores de pago.
+
+    @api {direct} payments/transactions New Transaction
+
+    @apiGroup RabbitMQ GET
+
+    @apiDescription Escucha a transacciones a procesar emitidas por adaptadores de pago.
+
+    @apiExample {json} Mensaje
+      {
+        "type": "logout",
+        "message" : "tokenId"
+      }
+    """
+    QUEUE = "transaction_task_queue"
+
+    try:
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host=config.get_rabbit_server_url())
+        )
+        channel = connection.channel()
+
+        channel.queue_declare(queue=QUEUE, durable=True)
+
+        def callback(ch, method, properties, body):
+            event = json.body_to_dic(body.decode('utf-8'))
+            if(len(validator.validateSchema(EVENT, event)) > 0):
+                return
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+
+        channel.basic_qos(prefetch_count=1)
+        channel.basic_consume(queue=QUEUE, on_message_callback=callback)
+
+        channel.start_consuming()
+
+    except Exception:
+        print("RabbitMQ Auth desconectado, intentando reconectar en 10'")
+        threading.Timer(10.0, initAuth).start()
+
+
+def postPayments():
     """
     payment-complete : 
 
@@ -138,7 +187,7 @@ def listenPayments():
       {
         "type": "payment-complete",
         "exchange" : "{payments}"
-        "queue" : "{payments}"
+        "queue" : ""
         "message" : {
             "paymentId": "{paymentId}",
             "orderId": "{orderId}",
@@ -146,70 +195,6 @@ def listenPayments():
     """
    
     EXCHANGE = "payments"
-    QUEUE = "payments"
+    QUEUE = ""
 
-    # try:
-    #     connection = pika.BlockingConnection(pika.ConnectionParameters(host=config.get_rabbit_server_url()))
-    #     channel = connection.channel()
-
-    #     channel.exchange_declare(exchange=EXCHANGE, exchange_type='fanout')
-
-    #     channel.queue_declare(queue=QUEUE)
-
-    #     channel.queue_bind(queue=QUEUE, exchange=EXCHANGE, routing_key=QUEUE)
-
-    #     def callback(ch, method, properties, body):
-    #         event = json.body_to_dic(body.decode('utf-8'))
-    #         if(len(validator.validateSchema(EVENT_CALLBACK, event)) > 0):
-    #             return
-
-    #         if (event["type"] == "article-exist"):
-    #             message = event["message"]
-    #             if(len(validator.validateSchema(MSG_ARTICLE_EXIST, message)) > 0):
-    #                 return
-
-    #             exchange = event["exchange"]
-    #             queue = event["queue"]
-    #             referenceId = message["referenceId"]
-    #             articleId = message["articleId"]
-
-    #             print("RabbitMQ Catalog GET article-exist catalogId:%r , articleId:%r", referenceId, articleId)
-
-    #             try:
-    #                 articleValidation.validateArticleExist(articleId)
-    #                 sendArticleValid(exchange, queue, referenceId, articleId, True)
-    #             except Exception:
-    #                 sendArticleValid(exchange, queue, referenceId, articleId, False)
-
-    #         if (event["type"] == "article-data"):
-    #             message = event["message"]
-    #             if(len(validator.validateSchema(MSG_ARTICLE_EXIST, message)) > 0):
-    #                 return
-
-    #             exchange = event["exchange"]
-    #             queue = event["queue"]
-    #             referenceId = message["referenceId"]
-    #             articleId = message["articleId"]
-
-    #             print("RabbitMQ Catalog GET article-data catalogId:%r , articleId:%r", referenceId, articleId)
-
-    #             try:
-    #                 article = crud.getArticle(articleId)
-    #                 valid = ("enabled" in article and article["enabled"])
-    #                 stock = article["stock"]
-    #                 price = article["price"]
-    #                 articleValidation.validateArticleExist(articleId)
-    #                 sendArticleData(exchange, queue, referenceId, articleId, valid, stock, price)
-    #             except Exception:
-    #                 sendArticleData(exchange, queue, referenceId, articleId, False, 0, 0)
-
-    #     print("RabbitMQ Catalog conectado")
-
-    #     channel.basic_consume(QUEUE, callback, consumer_tag=QUEUE, auto_ack=True)
-
-    #     channel.start_consuming()
-    # except Exception:
-    #     traceback.print_exc()
-    #     print("RabbitMQ Catalog desconectado, intentando reconectar en 10'")
-    #     threading.Timer(10.0, initCatalog).start()
 

@@ -7,5 +7,4 @@ client = pymongo.MongoClient(config.get_database_server_url(), config.get_databa
 db = client['payments']
 
 payments = db.payments
-db = client['transactions']
 transactions = db.transactions

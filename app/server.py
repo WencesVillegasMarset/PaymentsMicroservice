@@ -43,4 +43,4 @@ class MainApp:
     return self.flask_app
 
   def start(self):
-    self.flask_app.run(port=config.get_server_port())
+    self.flask_app.run(port=config.get_server_port(), debug=True)

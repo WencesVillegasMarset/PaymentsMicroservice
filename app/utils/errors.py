@@ -26,6 +26,7 @@
 import traceback #para interpretar y extraer traces
 
 import app.utils.json_serializer as json
+# import json_serializer as json
 
 
 class InvalidRequest(Exception):

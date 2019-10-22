@@ -15,6 +15,11 @@ def get_security_server_url():
 def get_security_server_port():
     return int(get_property("SecurityServerPort", 3000))
 
+def get_orders_server_url():
+    return get_property("OrdersServerUrl", "localhost")
+
+def get_orders_server_port():
+    return int(get_property("OrdersServerPort", 3004))
 
 def get_rabbit_server_url():
     return get_property("RabbitServerUrl", "localhost")

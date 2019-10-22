@@ -27,7 +27,8 @@ PAYMENT_DB_SCHEMA = {
         "currency":{
             "required": True,
             "type": str,
-            "lenght": 3,
+            "minLen": 3,
+            "maxLen": 3
         },
         "payments_service":{
             "required": True,
@@ -71,42 +72,6 @@ PAYMENT_DB_SCHEMA = {
 }
 
 
-TRANSACTION_DB_SCHEMA = {
-    "amount":{
-        "required": True,
-        "type": numbers.Real,
-        "min": 0
-    },
-    "id_payment":{
-        "required": True,
-        "type": str,
-    },
-    "status":{
-        "required": True,
-        "type": str,
-        "min": 0
-    },
-    "external_reference":{
-        "type": str,
-        "minLen": 1,
-        "maxLen": 60
-    }
-}
-
-def new_transaction():
-    '''
-        Crea una nueva transaccion inicializada
-    '''
-
-    return {
-        "amount":0,
-        "status":'',
-        "id_payment":'',
-        "external_reference":'',
-        "created": datetime.datetime.utcnow(),
-        "updated":datetime.datetime.utcnow()
-    }
-
 def new_payment():
 
     return {
@@ -120,7 +85,7 @@ def new_payment():
             "payments_service":''
         },
         "payment_status":{
-            "status":'',
+            "status":'initialized',
             "status_detail":'',
         },
         "total_amount":0.0,

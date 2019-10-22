@@ -2,14 +2,15 @@ import datetime
 # TODO : Investigar Repository Pattern para no acoplar a mongo este servicio
 import bson.objectid as bson
 import app.domain.payments.payment_schema as schema
+
 import app.utils.mongo as db
 import app.utils.errors as errors
 
 
 def getPayment(paymentId):
     '''
-    Obtiene un articulo con id = articleId
-    articleId : string ObjectId
+    Obtiene un payment con id = paymentId
+    paymentId : string ObjectId
     return dict(propiedad, valor) Payment
     '''
     '''
@@ -44,14 +45,14 @@ def getPayment(paymentId):
         @apiUse Errors
     '''
     try:
-        result = db.articles.find_one({'_id': bson.ObjectId(paymentId)})
+        result = db.payments.find_one({'_id': bson.ObjectId(paymentId)})
         if (not result):
             raise errors.InvalidArgument('_id', 'Payment does not exist')
         return result
     except Exception:
         raise errors.InvalidArgument('_id', 'Invalid object id')
 
-def addPayment(params):
+def addPayment(params, order, user):
     '''
     Create a new Payment
     params: dict(property, value) Payment
@@ -103,6 +104,9 @@ def addPayment(params):
     '''
     payment = schema.new_payment()
     payment.update(params)
+    payment['total_amount'] = order['totalPayment']
+    payment['id_user'] = user['id']
+
     '''
     Debe consultar a orders los detalles de la orden
     debe validar las preferencias de pago 
@@ -124,8 +128,9 @@ def updatePayment(paymentId, params):
     payment = getPayment(paymentId)
 
     payment.update(params)
-    payment["updated"] = datetime.datetime.utcnow()
 
+    payment["updated"] = datetime.datetime.utcnow()
+    
     schema.validate_schema(payment)
     
     del payment['_id']
@@ -133,66 +138,5 @@ def updatePayment(paymentId, params):
     payment['_id'] = paymentId
 
     return payment
-#implementar get Transactions
-def getTransactions(paymentId):
-    pass
-# Metodo para cancelar no tendria que estar en el CRUD
-# def cancelPayment(paymentId, params):
-#     '''
-#     Cancel a Payment
-#     payment: string ObjectId
-#     params: detail String
-#     return: dict<propiedad, valor> Payment
-#     '''
-#     '''
-
-#     @api {post} /v1/payments/:paymentId/cancel Cancel Payment
-#     @apiName Cancel Payment
-#     @apiGroup Payments
-
-#     @apiUse AuthHeader
-
-#     @apiExample {json} Body
-#         {
-#             "payment_id": "{id del payment}",
-#             "detail": "{detalle o descripcion (opcional)}"
-#         }
-
-#     @apiSuccessExample {json} Response
-#         HTTP/1.1 200 OK
-#         {
-#             "_id": "{id del payment}",
-#             "payment_preference": {
-#                 "id_payment_method": "{id del método de pago}",
-#                 "installments": "{número de cuotas}",
-#                 "currency": "{moneda elegida}",
-#                 "payment_service": "{servicio de procesamiento pagos a utilizar}",
-#             },
-#             "id_order": "{id de la orden}",
-#             "id_user": "{id del usuario}",
-#             "external_reference": "{referencia externa}",
-#             "status": [{
-#                     "status": "{estado del payment}",
-#                     "status_detail": "{observaciones}",
-#             }],
-#             "total_amount": "{monto total del payment}",
-#             "total_paid_amount": "{monto total pagado (sum(transactions)}",
-#             "updated": "{fecha última actualización}",
-#             "created": "{fecha creación}"
-#         }
-
-#         @apiUse Errors
-
-#     '''
-#     payment = getPayment(paymentId)
     
-#     payment.update(params)
-#     payment["updated"] = datetime.datetime.utcnow()
 
-#     schema.validate_schema(payment)
-    
-#     del payment['_id']
-#     res = db.payments.replace_one({'_id': bson.ObjectId(paymentId)}, payment)
-#     payment['_id'] = paymentId
-
-#     return payment
