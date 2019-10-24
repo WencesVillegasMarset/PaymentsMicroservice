@@ -44,10 +44,6 @@ MSG_PAYMENT_COMPLETE = {
         "required": True,
         "type": str
     },
-    "orderId": {
-        "required": True,
-        "type": str
-    }
 }
 
 
@@ -147,6 +143,7 @@ def listenTransactions():
         "message" : "tokenId"
       }
     """
+
     QUEUE = "transaction_task_queue"
 
     try:
@@ -170,10 +167,10 @@ def listenTransactions():
 
     except Exception:
         print("RabbitMQ Auth desconectado, intentando reconectar en 10'")
-        threading.Timer(10.0, initAuth).start()
+        threading.Timer(10.0, initTransactions).start()
 
 
-def postPayments():
+def postPayments(paymentId):
     """
     payment-complete : 
 
@@ -190,11 +187,21 @@ def postPayments():
         "queue" : ""
         "message" : {
             "paymentId": "{paymentId}",
-            "orderId": "{orderId}",
         }
     """
-   
-    EXCHANGE = "payments"
-    QUEUE = ""
+    try:
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host='localhost')
+        )
+        channel = connection.channel()
+        channel.exchange_declare(exchange='payments', exchange_type='fanout')
+        message = {
+            "paymentId": paymentId
+        }
+        channel.basic_publish(exchange='payments', routing_key='', body=json.dic_to_json(message))
 
+        connection.close()
 
+    except Exception:
+        print("Error conectando a RabbitMQ")
+    

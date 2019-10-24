@@ -23,11 +23,13 @@ def init(app):
     @app.route('/v1/payments', methods=['POST'])
     def addPayment():
         try:
-            user = security.isValidToken(flask.request.headers.get("Authorization"))
+            # TODO Duda : Como sacar las busquedas order y user en otro lado? se puede hacer?
+            token = flask.request.headers.get("Authorization")
+            user = security.isValidToken(token)
             params = json.body_to_dic(flask.request.data)
             params = restValidator.validateAddPaymentParams(params)
 
-            order = orders.getOrder(str(params['id_order']),flask.request.headers.get("Authorization"))
+            order = orders.getOrder(params['id_order'], token)
 
             # se comunica con un servicio externo
             result = payments_crud.addPayment(params, order, user)

@@ -4,6 +4,8 @@ import flask
 from flask_cors import CORS
 
 import app.domain.payments.routes as payments_routes
+import app.gateways.payment_gateway_routes as payment_gateway_routes
+
 import app.gateways.rabbit_service as rabbitService
 import app.utils.config as config
 
@@ -38,6 +40,9 @@ class MainApp:
 
   def _init_payments(self):
     payments_routes.init(self.flask_app)
+
+  def _init_payment_gateways(self):
+    payment_gateway_routes.init(self.flask_app)
 
   def get_flask_app(self):
     return self.flask_app
