@@ -1,6 +1,5 @@
 
 import flask
-import sys
 
 import app.domain.payments.payments_crud as payments_crud
 import app.domain.transactions.transactions_crud as transactions_crud
@@ -43,11 +42,13 @@ def init(app):
         try:
             security.isValidToken(flask.request.headers.get("Authorization"))
             params = json.body_to_dic(flask.request.data)
-            params['status'] = 'cancelled'
             params = restValidator.validateCancelPaymentParams(params)
-            # insertar logica para cancelar
-            result = payments_crud.updatePayment(paymentId, params)
-            return json.dic_to_json(result)
+            params['status'] = 'cancelled'
+            # aca hago el crud yo pero tendria que hacerse cuando llegue la notificacion de mp
+            # llamo a mp y cancelo
+            updated_payment = payments_crud.addStatus(paymentId, params)
+            res = payments_crud.updatePayment(paymentId, updated_payment)
+            return json.dic_to_json(res)
         except Exception as err:
             return errors.handleError(err)
 

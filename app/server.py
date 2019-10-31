@@ -4,7 +4,7 @@ import flask
 from flask_cors import CORS
 
 import app.domain.payments.routes as payments_routes
-import app.gateways.payment_gateway_routes as payment_gateway_routes
+import app.gateways.mercadopago.routes as mercadopago_routes
 
 import app.gateways.rabbit_service as rabbitService
 import app.utils.config as config
@@ -19,6 +19,7 @@ class MainApp:
     self._init_routes()
     self._init_rabbit()
     self._init_payments()
+    self._init_gateways()
 
   def _generate_api_doc(self):
     os.system("apidoc -i ./ -o ./public")
@@ -41,8 +42,11 @@ class MainApp:
   def _init_payments(self):
     payments_routes.init(self.flask_app)
 
-  def _init_payment_gateways(self):
-    payment_gateway_routes.init(self.flask_app)
+  def _init_gateways(self):
+    '''
+    Inicializa los endpoints de cada servicio de pagos
+    '''
+    mercadopago_routes.init(self.flask_app)
 
   def get_flask_app(self):
     return self.flask_app

@@ -140,3 +140,15 @@ def updatePayment(paymentId, params):
     return payment
     
 
+def addStatus(paymentId, params):
+    '''
+    Crea un nuevo objeto payment_status
+    '''
+    payment = getPayment(paymentId)
+
+    status = schema.new_payment_status()
+    status.update(params)
+
+    payment['payment_status'].append(status)
+
+    return payment

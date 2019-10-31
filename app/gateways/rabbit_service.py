@@ -52,7 +52,6 @@ def init():
     Inicializa los servicios Rabbit
     """
     initAuth()
-    initPayments()
     initTransactions()
     
 
@@ -69,8 +68,8 @@ def initPayments():
     """
     Inicializa RabbitMQ para enviar eventos acerca de payments.
     """
-    paymentsProducer = threading.Thread(target=postPayments)
-    paymentsProducer.start()
+    # paymentsProducer = threading.Thread(target=listenTransactions)
+    # paymentsProducer.start()
 def initTransactions():
     """
     Inicializa RabbitMQ para publicar y recibir mensajes acerca de transacciones.
@@ -156,18 +155,66 @@ def listenTransactions():
 
         def callback(ch, method, properties, body):
             event = json.body_to_dic(body.decode('utf-8'))
-            if(len(validator.validateSchema(EVENT, event)) > 0):
-                return
+            
+            
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
         channel.basic_qos(prefetch_count=1)
+
+        print("RabbitMQ PaymentTransactions conectado")
+
         channel.basic_consume(queue=QUEUE, on_message_callback=callback)
 
         channel.start_consuming()
 
     except Exception:
-        print("RabbitMQ Auth desconectado, intentando reconectar en 10'")
+        print("RabbitMQ PaymentTransactions desconectado, intentando reconectar en 10'")
         threading.Timer(10.0, initTransactions).start()
+
+def postTransactions(message):
+    # TODO : Documentar esto
+    """
+    transaction-recieved : 
+
+    @api {fanout} transactions/transaction_task_queue Post New Transaction
+
+    @apiGroup RabbitMQ POST
+
+    @apiDescription Postea transacciones recibidas a procesar 
+
+    @apiExample {json} Mensaje
+      {
+        "type": "payment-complete",
+        "exchange" : "{''}"
+        "queue" : ""
+        "message" : {
+            "transaction": "{paymentId}",
+        }
+    """
+
+    QUEUE = "transaction_task_queue"
+
+    try:
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host=config.get_rabbit_server_url())
+        )
+        channel = connection.channel()
+
+        channel.queue_declare(queue=QUEUE, durable=True)
+
+        message = message
+        channel.basic_publish(
+            exchange='',
+            routing_key=QUEUE,
+            body=json.dic_to_json(message),
+            properties=pika.BasicProperties(
+                delivery_mode=2,  # make message persistent
+            ))
+
+        connection.close()
+
+    except Exception:
+        print("Error enviando mensaje a " + QUEUE)
 
 
 def postPayments(paymentId):
@@ -205,3 +252,4 @@ def postPayments(paymentId):
     except Exception:
         print("Error conectando a RabbitMQ")
     
+# TODO : Escuchar orders-placed

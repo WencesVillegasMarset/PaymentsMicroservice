@@ -10,7 +10,7 @@ VALID_CURRENCIES = ['ARS']
 # Son validaciones sobre las propiedades que pueden actualizarse desde REST
 
 PAYMENT_CANCEL_SCHEMA = {
-    "description": {
+    "status_detail": {
         "required": False,
         "type": str,
         "minLen": 1,

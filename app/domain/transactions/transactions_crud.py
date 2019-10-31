@@ -1,7 +1,7 @@
 import datetime
 # TODO : Investigar Repository Pattern para no acoplar a mongo este servicio
 import bson.objectid as bson
-import app.domain.payments.transaction_schema as schema
+import app.domain.transactions.transaction_schema as schema
 
 import app.utils.mongo as db
 import app.utils.errors as errors

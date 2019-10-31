@@ -28,6 +28,24 @@ define({ "api": [
     "name": ""
   },
   {
+    "type": "direct",
+    "url": "payments/transactions",
+    "title": "New Transaction",
+    "group": "RabbitMQ_GET",
+    "description": "<p>Escucha a transacciones a procesar emitidas por adaptadores de pago.</p>",
+    "examples": [
+      {
+        "title": "Mensaje",
+        "content": "{\n  \"type\": \"logout\",\n  \"message\" : \"tokenId\"\n}",
+        "type": "json"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./app/gateways/rabbit_service.py",
+    "groupTitle": "RabbitMQ_GET",
+    "name": "DirectPaymentsTransactions"
+  },
+  {
     "type": "fanout",
     "url": "auth/logout",
     "title": "Logout",
@@ -54,7 +72,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Mensaje",
-        "content": "{\n  \"type\": \"payment-complete\",\n  \"exchange\" : \"{payments}\"\n  \"queue\" : \"{payments}\"\n  \"message\" : {\n      \"paymentId\": \"{paymentId}\",\n      \"orderId\": \"{orderId}\",\n  }",
+        "content": "{\n  \"type\": \"payment-complete\",\n  \"exchange\" : \"{payments}\"\n  \"queue\" : \"\"\n  \"message\" : {\n      \"paymentId\": \"{paymentId}\",\n  }",
         "type": "json"
       }
     ],
@@ -62,5 +80,23 @@ define({ "api": [
     "filename": "./app/gateways/rabbit_service.py",
     "groupTitle": "RabbitMQ_POST",
     "name": "FanoutPaymentsPaymentComplete"
+  },
+  {
+    "type": "fanout",
+    "url": "transactions/transaction_task_queue",
+    "title": "Post New Transaction",
+    "group": "RabbitMQ_POST",
+    "description": "<p>Postea transacciones recibidas a procesar</p>",
+    "examples": [
+      {
+        "title": "Mensaje",
+        "content": "{\n  \"type\": \"payment-complete\",\n  \"exchange\" : \"{''}\"\n  \"queue\" : \"\"\n  \"message\" : {\n      \"transaction\": \"{paymentId}\",\n  }",
+        "type": "json"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./app/gateways/rabbit_service.py",
+    "groupTitle": "RabbitMQ_POST",
+    "name": "FanoutTransactionsTransaction_task_queue"
   }
 ] });

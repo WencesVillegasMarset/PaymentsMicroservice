@@ -45,7 +45,7 @@ PAYMENT_DB_SCHEMA = {
         "required": True,
         "type": str,
     },
-    "payment_status":{
+    "payment_status":[{
         "status":{
             "required": True,
             "type": str,
@@ -58,7 +58,7 @@ PAYMENT_DB_SCHEMA = {
             "minLen": 1,
             "maxLen": 2300,
         }
-    },
+    }],
     "total_amount":{
         "required": False,
         "type": numbers.Real,
@@ -72,6 +72,14 @@ PAYMENT_DB_SCHEMA = {
 }
 
 
+def new_payment_status():
+
+    return {
+            "status":'',
+            "status_detail":'',
+            "created": datetime.datetime.utcnow(),
+        }
+
 def new_payment():
 
     return {
@@ -84,10 +92,11 @@ def new_payment():
             "currency":'',
             "payments_service":''
         },
-        "payment_status":{
+        "payment_status":[{
             "status":'initialized',
             "status_detail":'',
-        },
+            "created": datetime.datetime.utcnow(),
+        }],
         "total_amount":0.0,
         "total_paid_amount":0.0,
         "created": datetime.datetime.utcnow(),
