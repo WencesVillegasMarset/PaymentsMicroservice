@@ -1,27 +1,25 @@
-'''
-
+"""
 @apiDefine Errors
 
 @apiErrorExample 400 Bad Request
     HTTP/1.1 400 Bad Request
     {
-        "path": "{Property name}",
-        "message": "{Error cause}"
+        "path" : "{Nombre de la propiedad}",
+        "message" : "{Motivo del error}"
     }
 
 @apiErrorExample 400 Bad Request
     HTTP/1.1 400 Bad Request
     {
-        "error": "{Error cause}"
+        "error" : "{Motivo del error}"
     }
 
 @apiErrorExample 500 Server Error
     HTTP/1.1 500 Server Error
     {
-        "error": "{Error cause}"
+        "error" : "{Motivo del error}"
     }
-
-'''
+"""
 
 import traceback #para interpretar y extraer traces
 

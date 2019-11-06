@@ -1,5 +1,4 @@
 import datetime
-# TODO : Investigar Repository Pattern para no acoplar a mongo este servicio
 import bson.objectid as bson
 import app.domain.payments.payment_schema as schema
 
@@ -13,37 +12,8 @@ def getPayment(paymentId):
     paymentId : string ObjectId
     return dict(propiedad, valor) Payment
     '''
-    '''
-    
-    @api {get} /v1/payments/:paymentId Get Payment
-    @apiName Get Payment
-    @apiGroup Payments
 
-    @apiSuccessExample {json} Response
-        HTTP/1.1 200 OK
-        {
-            "_id": "{payment id}",
-            "payment_preference": {
-                "payment_method": "{método de pago}",
-                "installments": "{numero de cuotas}",
-                "currency": "{currency selected}",
-                "payment_service": "{payment processing service selected}",
-            },
-            "id_order": "{id de la orden}",
-            "id_user": "{id del usuario}",
-            "external_reference": "{referencia externa}",
-            "status": [{
-                    "status": "{estado del payment}",
-                    "status_detail": "{observaciones}",
-                    "created": "{fecha creación}"
-            }],
-            "total_amount": "{monto total del payment}",
-            "total_paid_amount": "{monto total pagado (sum(transactions)}",
-            "updated": "{fecha última actualización}",
-            "created": "{fecha creación}"
-        }
-        @apiUse Errors
-    '''
+
     try:
         result = db.payments.find_one({'_id': bson.ObjectId(paymentId)})
         if (not result):
@@ -58,50 +28,7 @@ def addPayment(params, order, user):
     params: dict(property, value) Payment
     return: dict(property, value) Payment
     '''
-    '''
-
-    @api {post} /v1/payments/ Create Payment
-    @apiName Create Payment
-    @apiGroup Payments
-
-    @apiUse AuthHeader
-
-    @apiExample {json} Body
-        {
-        "order_id": "{id de la orden}",
-        "payment_preference": {
-            "installments": "{número de cuotas}",
-            "id_payment_method": "{id del método de pago}",
-            "currency": "{moneda elegida}",
-            "payment_service": "{servicio de procesamiento pagos a utilizar}",
-        }
-
-    @apiSuccessExample {json} Response
-        HTTP/1.1 201 CREATED
-        {
-            "_id": "{id del payment}",
-            "payment_preference": {
-                "id_payment_method": "{id del método de pago}",
-                "installments": "{número de cuotas}",
-                "currency": "{moneda elegida}",
-                "payment_service": "{servicio de procesamiento pagos a utilizar}",
-            },
-            "id_order": "{id de la orden}",
-            "id_user": "{id del usuario}",
-            "external_reference": "{referencia externa}",
-            "status": [{
-                    "status": "{estado del payment}",
-                    "status_detail": "{observaciones}",
-            }],
-            "total_amount": "{monto total del payment}",
-            "total_paid_amount": "{monto total pagado (sum(transactions)}",
-            "updated": "{fecha última actualización}",
-            "created": "{fecha creación}"
-        }
-
-        @apiUse Errors
-
-    '''
+    
     payment = schema.new_payment()
     payment.update(params)
     payment['total_amount'] = order['totalPayment']

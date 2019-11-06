@@ -18,6 +18,7 @@ def init(app):
         '''
         try:
             # validar que la request sea de mercadopago
+            # TODO : Validar lo que entra por este endpoint
             params = json.body_to_dic(flask.request.data)
             #creo el evento de rabbit y lo mando
             rabbit_service.postTransactions(params)

@@ -23,12 +23,11 @@ TRANSACTION_DB_SCHEMA = {
     "status":{
         "required": True,
         "type": str,
-        "min": 0
+        "minLen": 1,
+        "maxLen": 60
     },
     "external_reference":{
         "type": str,
-        "minLen": 1,
-        "maxLen": 60
     }
 }
 

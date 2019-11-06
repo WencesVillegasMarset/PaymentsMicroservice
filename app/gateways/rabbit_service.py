@@ -53,7 +53,7 @@ def init():
     """
     initAuth()
     initTransactions()
-    
+    initPayments()
 
 
 def initAuth():
@@ -68,14 +68,15 @@ def initPayments():
     """
     Inicializa RabbitMQ para enviar eventos acerca de payments.
     """
-    # paymentsProducer = threading.Thread(target=listenTransactions)
-    # paymentsProducer.start()
+    paymentsConsumer = threading.Thread(target=listenPayments)
+    paymentsConsumer.start()
+
 def initTransactions():
     """
     Inicializa RabbitMQ para publicar y recibir mensajes acerca de transacciones.
     """
-    paymentsProducer = threading.Thread(target=listenTransactions)
-    paymentsProducer.start()
+    transactionConsumer = threading.Thread(target=listenTransactions)
+    transactionConsumer.start()
 
 def listenAuth():
     """
@@ -127,10 +128,14 @@ def listenAuth():
 
 
 def listenTransactions():
+    
+    import app.domain.transactions.transactions_crud as transactions_crud 
+    import app.domain.transactions.transactions_service as transactions_service 
+
     """
     Escucha a transacciones a procesar emitidas por adaptadores de pago.
 
-    @api {direct} payments/transactions New Transaction
+    @api {direct} payments/transaction_task_queue Process Transaction
 
     @apiGroup RabbitMQ GET
 
@@ -138,8 +143,13 @@ def listenTransactions():
 
     @apiExample {json} Mensaje
       {
-        "type": "logout",
-        "message" : "tokenId"
+        "type": "transaction_task_queue",
+        "message" : {
+            "amount":{Float},
+            "status":{String},
+            "id_payment":{String},
+            "external_reference":{String}
+        }
       }
     """
 
@@ -149,14 +159,15 @@ def listenTransactions():
         connection = pika.BlockingConnection(
             pika.ConnectionParameters(host=config.get_rabbit_server_url())
         )
+
         channel = connection.channel()
 
         channel.queue_declare(queue=QUEUE, durable=True)
 
         def callback(ch, method, properties, body):
-            event = json.body_to_dic(body.decode('utf-8'))
-            
-            
+
+            params = json.body_to_dic(body.decode('utf-8'))
+            transactions_service.process_transaction(params)
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
         channel.basic_qos(prefetch_count=1)
@@ -167,14 +178,15 @@ def listenTransactions():
 
         channel.start_consuming()
 
-    except Exception:
+    except Exception as err:
+        print(err)
         print("RabbitMQ PaymentTransactions desconectado, intentando reconectar en 10'")
         threading.Timer(10.0, initTransactions).start()
 
 def postTransactions(message):
     # TODO : Documentar esto
     """
-    transaction-recieved : 
+    Postea eventos de notificacion acerca de transacciones de pagos
 
     @api {fanout} transactions/transaction_task_queue Post New Transaction
 
@@ -184,11 +196,14 @@ def postTransactions(message):
 
     @apiExample {json} Mensaje
       {
-        "type": "payment-complete",
+        "type": "transaction",
         "exchange" : "{''}"
         "queue" : ""
         "message" : {
-            "transaction": "{paymentId}",
+            "amount":{Float},
+            "id_payment":{String},
+            "status":{String},
+            "external_reference":{String}
         }
     """
 
@@ -207,9 +222,7 @@ def postTransactions(message):
             exchange='',
             routing_key=QUEUE,
             body=json.dic_to_json(message),
-            properties=pika.BasicProperties(
-                delivery_mode=2,  # make message persistent
-            ))
+            properties=pika.BasicProperties(delivery_mode=2))
 
         connection.close()
 
@@ -253,3 +266,50 @@ def postPayments(paymentId):
         print("Error conectando a RabbitMQ")
     
 # TODO : Escuchar orders-placed
+
+def listenPayments():
+    """
+    Escucha a eventos de payments-complete enviados por Payments.
+
+    @api {fanout} payments/payment-complete Payment Complete
+
+    @apiGroup RabbitMQ GET
+
+    @apiDescription Escucha a eventos de payments-complete enviados por Payments.
+
+    @apiExample {json} Mensaje
+      {
+        "type": "payment-complete",
+        "exchange" : "{payments}"
+        "message" : {
+            "paymentId": "{paymentId}",
+        }
+      }
+    """
+    EXCHANGE = "payments"
+
+    try:
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host=config.get_rabbit_server_url())
+        )
+        channel = connection.channel()
+
+        channel.exchange_declare(exchange=EXCHANGE, exchange_type='fanout')
+
+        result = channel.queue_declare('', exclusive=True)
+        queue_name = result.method.queue
+
+        channel.queue_bind(exchange=EXCHANGE, queue=queue_name)
+
+        def callback(ch, method, properties, body):
+            event = json.body_to_dic(body.decode('utf-8'))
+            print(event)
+
+        print("RabbitMQ Payments GET conectado")
+
+        channel.basic_consume(queue_name, callback, auto_ack=True)
+
+        channel.start_consuming()
+    except Exception:
+        print("RabbitMQ Payments desconectado, intentando reconectar en 10'")
+        threading.Timer(10.0, initAuth).start()
