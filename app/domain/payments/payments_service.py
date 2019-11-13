@@ -9,7 +9,7 @@ import app.utils.errors as errors
 def updatePayment(paymentId):
     payment = payments_crud.getPayment(paymentId)
     transactions = transactions_crud.getTransactions(paymentId)
-
+    
     transaction_total = 0
     for transaction in transactions:
         transaction_total += transaction['amount']

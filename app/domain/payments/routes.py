@@ -178,6 +178,8 @@ def init(app):
     @app.route('/v1/payments/<paymentId>', methods=['GET'])
     def getPayment(paymentId):
         try:
+            token = flask.request.headers.get("Authorization")
+            user = security.isValidToken(token)
             return json.dic_to_json(payments_crud.getPayment(paymentId))
         except Exception as err:
             return errors.handleError(err)

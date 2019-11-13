@@ -12,8 +12,6 @@ def getPayment(paymentId):
     paymentId : string ObjectId
     return dict(propiedad, valor) Payment
     '''
-
-
     try:
         result = db.payments.find_one({'_id': bson.ObjectId(paymentId)})
         if (not result):
@@ -72,6 +70,11 @@ def addStatus(paymentId, params):
     Crea un nuevo objeto payment_status
     '''
     payment = getPayment(paymentId)
+    if payment['total_paid_amount'] != 0:
+        raise errors.InvalidRequest('Payment cannot be cancelled')
+    for status in payment['payment_status']:
+        if status['status'] == 'cancelled':
+            raise errors.InvalidRequest('Payment cannot be cancelled')
 
     status = schema.new_payment_status()
     status.update(params)

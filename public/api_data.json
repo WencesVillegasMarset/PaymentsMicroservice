@@ -262,7 +262,7 @@
     "examples": [
       {
         "title": "Mensaje",
-        "content": "{\n  \"type\": \"logout\",\n  \"message\" : \"tokenId\"\n}",
+        "content": "{\n  \"type\": \"transaction_task_queue\",\n  \"message\" : {\n      \"amount\":{Float},\n      \"status\":{String},\n      \"id_payment\":{String},\n      \"external_reference\":{String}\n  }\n}",
         "type": "json"
       }
     ],
@@ -293,7 +293,7 @@
     "type": "fanout",
     "url": "payments/payment-complete",
     "title": "Payment Complete",
-    "group": "RabbitMQ_GET",
+    "group": "RabbitMQ_GET_MOCK",
     "description": "<p>Escucha a eventos de payments-complete enviados por Payments.</p>",
     "examples": [
       {
@@ -304,13 +304,31 @@
     ],
     "version": "0.0.0",
     "filename": "./app/gateways/rabbit_service.py",
-    "groupTitle": "RabbitMQ_GET",
+    "groupTitle": "RabbitMQ_GET_MOCK",
     "name": "FanoutPaymentsPaymentComplete"
   },
   {
     "type": "fanout",
+    "url": "payments/payments-failed",
+    "title": "Payment Complete",
+    "group": "RabbitMQ_GET_MOCK",
+    "description": "<p>Escucha a eventos de payments-failed enviados por Payments.</p>",
+    "examples": [
+      {
+        "title": "Mensaje",
+        "content": "{\n  \"type\": \"payment-failed\",\n  \"exchange\" : \"{payments-failed}\"\n  \"message\" : {\n      \"paymentId\": \"{paymentId}\",\n  }\n}",
+        "type": "json"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./app/gateways/rabbit_service.py",
+    "groupTitle": "RabbitMQ_GET_MOCK",
+    "name": "FanoutPaymentsPaymentsFailed"
+  },
+  {
+    "type": "fanout",
     "url": "payments/payment-complete",
-    "title": "Successful Payment",
+    "title": "Payment Complete",
     "group": "RabbitMQ_POST",
     "description": "<p>Postea eventos sobre pagos a ordenes completos con exito</p>",
     "examples": [
@@ -324,6 +342,24 @@
     "filename": "./app/gateways/rabbit_service.py",
     "groupTitle": "RabbitMQ_POST",
     "name": "FanoutPaymentsPaymentComplete"
+  },
+  {
+    "type": "fanout",
+    "url": "payments/payments-failed",
+    "title": "Payment Failed",
+    "group": "RabbitMQ_POST",
+    "description": "<p>Postea eventos sobre pagos fallidos</p>",
+    "examples": [
+      {
+        "title": "Mensaje",
+        "content": "{\n  \"type\": \"payment-failed\",\n  \"exchange\" : \"{payments-failed}\"\n  \"queue\" : \"\"\n  \"message\" : {\n      \"paymentId\": \"{paymentId}\",\n  }",
+        "type": "json"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./app/gateways/rabbit_service.py",
+    "groupTitle": "RabbitMQ_POST",
+    "name": "FanoutPaymentsPaymentsFailed"
   },
   {
     "type": "fanout",

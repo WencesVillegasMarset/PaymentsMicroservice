@@ -2,7 +2,7 @@
 
 import threading
 import traceback
-
+# TODO : Pago rechazado
 import pika
 
 import app.domain.payments.payments_crud as crud
@@ -54,7 +54,7 @@ def init():
     initAuth()
     initTransactions()
     initPayments()
-
+    initPaymentsFailed()
 
 def initAuth():
     """
@@ -70,6 +70,13 @@ def initPayments():
     """
     paymentsConsumer = threading.Thread(target=listenPayments)
     paymentsConsumer.start()
+
+def initPaymentsFailed():
+    """
+    Inicializa RabbitMQ para enviar eventos acerca de payments.
+    """
+    paymentsFailedConsumer = threading.Thread(target=listenPaymentsFailed)
+    paymentsFailedConsumer.start()
 
 def initTransactions():
     """
@@ -128,7 +135,7 @@ def listenAuth():
 
 
 def listenTransactions():
-    
+
     import app.domain.transactions.transactions_crud as transactions_crud 
     import app.domain.transactions.transactions_service as transactions_service 
 
@@ -162,10 +169,9 @@ def listenTransactions():
 
         channel = connection.channel()
 
-        channel.queue_declare(queue=QUEUE, durable=True)
+        channel.queue_declare(queue=QUEUE, durable=False)
 
         def callback(ch, method, properties, body):
-
             params = json.body_to_dic(body.decode('utf-8'))
             transactions_service.process_transaction(params)
             ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -180,11 +186,11 @@ def listenTransactions():
 
     except Exception as err:
         print(err)
-        print("RabbitMQ PaymentTransactions desconectado, intentando reconectar en 10'")
+        print("RabbitMQ PaymentTransactions, intentando reconectar en 10'")
         threading.Timer(10.0, initTransactions).start()
+   
 
 def postTransactions(message):
-    # TODO : Documentar esto
     """
     Postea eventos de notificacion acerca de transacciones de pagos
 
@@ -215,9 +221,8 @@ def postTransactions(message):
         )
         channel = connection.channel()
 
-        channel.queue_declare(queue=QUEUE, durable=True)
+        channel.queue_declare(queue=QUEUE, durable=False)
 
-        message = message
         channel.basic_publish(
             exchange='',
             routing_key=QUEUE,
@@ -226,7 +231,8 @@ def postTransactions(message):
 
         connection.close()
 
-    except Exception:
+    except Exception as err:
+        print(err)
         print("Error enviando mensaje a " + QUEUE)
 
 
@@ -234,7 +240,7 @@ def postPayments(paymentId):
     """
     payment-complete : 
 
-    @api {fanout} payments/payment-complete Successful Payment
+    @api {fanout} payments/payment-complete Payment Complete 
 
     @apiGroup RabbitMQ POST
 
@@ -258,14 +264,49 @@ def postPayments(paymentId):
         message = {
             "paymentId": paymentId
         }
-        channel.basic_publish(exchange='payments', routing_key='', body=json.dic_to_json(message))
+        channel.basic_publish(exchange='payments', routing_key='', 
+            body=json.dic_to_json(message))
 
         connection.close()
 
     except Exception:
-        print("Error conectando a RabbitMQ")
+        print("Error posteando payment completado")
     
-# TODO : Escuchar orders-placed
+def postPaymentsFailed(paymentId):
+    """
+    payment-failed : 
+
+    @api {fanout} payments/payments-failed Payment Failed 
+
+    @apiGroup RabbitMQ POST
+
+    @apiDescription Postea eventos sobre pagos fallidos
+
+    @apiExample {json} Mensaje
+      {
+        "type": "payment-failed",
+        "exchange" : "{payments-failed}"
+        "queue" : ""
+        "message" : {
+            "paymentId": "{paymentId}",
+        }
+    """
+    try:
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host='localhost')
+        )
+        channel = connection.channel()
+        channel.exchange_declare(exchange='payments-failed', exchange_type='fanout')
+        message = {
+            "paymentId": paymentId
+        }
+        channel.basic_publish(exchange='payments-failed', routing_key='',
+             body=json.dic_to_json(message))
+
+        connection.close()
+
+    except Exception:
+        print("Error enviando payments-failed")
 
 def listenPayments():
     """
@@ -273,7 +314,7 @@ def listenPayments():
 
     @api {fanout} payments/payment-complete Payment Complete
 
-    @apiGroup RabbitMQ GET
+    @apiGroup RabbitMQ GET MOCK
 
     @apiDescription Escucha a eventos de payments-complete enviados por Payments.
 
@@ -303,6 +344,7 @@ def listenPayments():
 
         def callback(ch, method, properties, body):
             event = json.body_to_dic(body.decode('utf-8'))
+            print("Payment Successfull!")
             print(event)
 
         print("RabbitMQ Payments GET conectado")
@@ -311,5 +353,54 @@ def listenPayments():
 
         channel.start_consuming()
     except Exception:
-        print("RabbitMQ Payments desconectado, intentando reconectar en 10'")
-        threading.Timer(10.0, initAuth).start()
+        print("RabbitMQ Payments Complete GET desconectado, intentando reconectar en 10'")
+        threading.Timer(10.0, initPayments).start()
+
+
+def listenPaymentsFailed():
+    """
+    Escucha a eventos de payments-failed enviados por Payments.
+
+    @api {fanout} payments/payments-failed Payment Complete
+
+    @apiGroup RabbitMQ GET MOCK
+
+    @apiDescription Escucha a eventos de payments-failed enviados por Payments.
+
+    @apiExample {json} Mensaje
+      {
+        "type": "payment-failed",
+        "exchange" : "{payments-failed}"
+        "message" : {
+            "paymentId": "{paymentId}",
+        }
+      }
+    """
+    EXCHANGE = "payments-failed"
+
+    try:
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host=config.get_rabbit_server_url())
+        )
+        channel = connection.channel()
+
+        channel.exchange_declare(exchange=EXCHANGE, exchange_type='fanout')
+
+        result = channel.queue_declare('', exclusive=True)
+        queue_name = result.method.queue
+
+        channel.queue_bind(exchange=EXCHANGE, queue=queue_name)
+
+        def callback(ch, method, properties, body):
+            event = json.body_to_dic(body.decode('utf-8'))
+            print("Payment Failed!")
+            print(event)
+
+        print("RabbitMQ Payments GET conectado")
+
+        channel.basic_consume(queue_name, callback, auto_ack=True)
+
+        channel.start_consuming()
+    except Exception:
+        print("RabbitMQ Payments Failed GET desconectado, intentando reconectar en 10'")
+        threading.Timer(10.0, initPaymentsFailed).start()
