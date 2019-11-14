@@ -73,7 +73,9 @@ PAYMENT_DB_SCHEMA = {
 
 
 def new_payment_status():
-
+    '''
+    Crea un nuevo estado de pago
+    '''
     return {
             "status":'',
             "status_detail":'',

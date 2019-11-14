@@ -1,5 +1,78 @@
 define({ "api": [
   {
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "optional": false,
+            "field": "varname1",
+            "description": "<p>No type.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "varname2",
+            "description": "<p>With type.</p>"
+          }
+        ]
+      }
+    },
+    "type": "",
+    "url": "",
+    "version": "0.0.0",
+    "filename": "./doc/main.js",
+    "group": "C__Users_Jorge_Documents_repos_PaymentsMicroservice_doc_main_js",
+    "groupTitle": "C__Users_Jorge_Documents_repos_PaymentsMicroservice_doc_main_js",
+    "name": ""
+  },
+  {
+    "type": "post",
+    "url": "/v1/gateways/mercadopago/ipn",
+    "title": "Get Transactions (IPN)",
+    "name": "Get_Transactions",
+    "group": "MercadoPago",
+    "examples": [
+      {
+        "title": "Body",
+        "content": "\n{ // Ejemplo de webhook, en la practica mando el JSON de transaccion directo\n    \"id\": 12345,\n    \"live_mode\": true,\n    \"type\": \"payment\",\n    \"date_created\": \"2015-03-25T10:04:58.396-04:00\",\n    \"application_id\": 123123123,\n    \"user_id\": 44444,\n    \"version\": 1,\n    \"api_version\": \"v1\",\n    \"action\": \"payment.created\",\n    \"data\": {\n        \"id\": \"999999999\"\n    }\n}",
+        "type": "json"
+      }
+    ],
+    "success": {
+      "examples": [
+        {
+          "title": "Response",
+          "content": "HTTP/1.1 200 OK",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "./app/gateways/mercadopago/routes.py",
+    "groupTitle": "MercadoPago",
+    "error": {
+      "examples": [
+        {
+          "title": "400 Bad Request",
+          "content": "HTTP/1.1 400 Bad Request\n{\n    \"path\" : \"{Nombre de la propiedad}\",\n    \"message\" : \"{Motivo del error}\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "400 Bad Request",
+          "content": "HTTP/1.1 400 Bad Request\n{\n    \"error\" : \"{Motivo del error}\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "500 Server Error",
+          "content": "HTTP/1.1 500 Server Error\n{\n    \"error\" : \"{Motivo del error}\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
     "type": "post",
     "url": "/v1/payments/:paymentId/cancel",
     "title": "Cancel Payment",
@@ -27,7 +100,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "app/domain/payments/routes.py",
+    "filename": "./app/domain/payments/routes.py",
     "groupTitle": "Payments",
     "error": {
       "examples": [
@@ -82,7 +155,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "app/domain/payments/routes.py",
+    "filename": "./app/domain/payments/routes.py",
     "groupTitle": "Payments",
     "error": {
       "examples": [
@@ -125,7 +198,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "app/domain/payments/routes.py",
+    "filename": "./app/domain/payments/routes.py",
     "groupTitle": "Payments",
     "examples": [
       {
@@ -175,7 +248,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "app/domain/payments/routes.py",
+    "filename": "./app/domain/payments/routes.py",
     "groupTitle": "Payments",
     "error": {
       "examples": [
@@ -211,7 +284,7 @@ define({ "api": [
       }
     ],
     "version": "0.0.0",
-    "filename": "app/gateways/rabbit_service.py",
+    "filename": "./app/gateways/rabbit_service.py",
     "groupTitle": "RabbitMQ_GET",
     "name": "DirectPaymentsTransaction_task_queue"
   },
@@ -229,7 +302,7 @@ define({ "api": [
       }
     ],
     "version": "0.0.0",
-    "filename": "app/gateways/rabbit_service.py",
+    "filename": "./app/gateways/rabbit_service.py",
     "groupTitle": "RabbitMQ_GET",
     "name": "FanoutAuthLogout"
   },
@@ -247,7 +320,7 @@ define({ "api": [
       }
     ],
     "version": "0.0.0",
-    "filename": "app/gateways/rabbit_service.py",
+    "filename": "./app/gateways/rabbit_service.py",
     "groupTitle": "RabbitMQ_GET_MOCK",
     "name": "FanoutPaymentsPaymentComplete"
   },
@@ -265,7 +338,7 @@ define({ "api": [
       }
     ],
     "version": "0.0.0",
-    "filename": "app/gateways/rabbit_service.py",
+    "filename": "./app/gateways/rabbit_service.py",
     "groupTitle": "RabbitMQ_GET_MOCK",
     "name": "FanoutPaymentsPaymentsFailed"
   },
@@ -283,7 +356,7 @@ define({ "api": [
       }
     ],
     "version": "0.0.0",
-    "filename": "app/gateways/rabbit_service.py",
+    "filename": "./app/gateways/rabbit_service.py",
     "groupTitle": "RabbitMQ_POST",
     "name": "FanoutPaymentsPaymentComplete"
   },
@@ -301,7 +374,7 @@ define({ "api": [
       }
     ],
     "version": "0.0.0",
-    "filename": "app/gateways/rabbit_service.py",
+    "filename": "./app/gateways/rabbit_service.py",
     "groupTitle": "RabbitMQ_POST",
     "name": "FanoutPaymentsPaymentsFailed"
   },
@@ -319,7 +392,7 @@ define({ "api": [
       }
     ],
     "version": "0.0.0",
-    "filename": "app/gateways/rabbit_service.py",
+    "filename": "./app/gateways/rabbit_service.py",
     "groupTitle": "RabbitMQ_POST",
     "name": "FanoutTransactionsTransaction_task_queue"
   }

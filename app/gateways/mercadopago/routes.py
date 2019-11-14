@@ -10,7 +10,37 @@ def init(app):
     Inicializa las rutas para Gateways de Pagos
     app: Flask
     """
+    
+    """
 
+    @api {post} /v1/gateways/mercadopago/ipn Get Transactions (IPN)
+    @apiName Get Transactions
+    @apiGroup MercadoPago
+
+
+    @apiExample {json} Body
+        
+        { // Ejemplo de webhook, en la practica mando el JSON de transaccion directo
+            "id": 12345,
+            "live_mode": true,
+            "type": "payment",
+            "date_created": "2015-03-25T10:04:58.396-04:00",
+            "application_id": 123123123,
+            "user_id": 44444,
+            "version": 1,
+            "api_version": "v1",
+            "action": "payment.created",
+            "data": {
+                "id": "999999999"
+            }
+        }
+
+    @apiSuccessExample {json} Response
+        HTTP/1.1 200 OK
+
+    @apiUse Errors
+
+    """
     @app.route('/v1/gateways/mercadopago/ipn', methods=['POST'])
     def notificationMercadoPago():
         '''

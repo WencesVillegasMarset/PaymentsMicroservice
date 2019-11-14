@@ -67,7 +67,10 @@ def updatePayment(paymentId, params):
 
 def addStatus(paymentId, params):
     '''
-    Crea un nuevo objeto payment_status
+    Crea un nuevo objeto payment_status y lo agrega al payment especificado
+    param paymentId : string ObjectId
+    param params : dict<propiedad, valor> 
+    return: dict<propiedad, valor> Payment    
     '''
     payment = getPayment(paymentId)
     if payment['total_paid_amount'] != 0:

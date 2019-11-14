@@ -6,6 +6,12 @@ import app.gateways.rabbit_service as rabbit_service
 import app.utils.errors as errors
 
 def process_transaction(params):
+    '''
+    Procesa una transaccion en cola
+    Actualiza el pago correspondiente segun los datos de la transaccion
+    params : dict(propiedad, valor) Transaction
+    return : None
+    '''
     try:
         transaction = transactions_crud.addTransactions(params)
         if params['status'] == 'rejected':

@@ -1,6 +1,7 @@
 import mercadopago
-# TODO : Duda, donde crearia ese DTO?, hago una funcion dentro de este wrapper (adaptador) para MP?
-
+'''
+    No terminado
+'''
 TRANSACTION_STATUS_MAP = {
     "pending":{
         "internal_status": "pending",
