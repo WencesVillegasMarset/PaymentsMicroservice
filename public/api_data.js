@@ -1,61 +1,5 @@
 define({ "api": [
   {
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "optional": false,
-            "field": "varname1",
-            "description": "<p>No type.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "varname2",
-            "description": "<p>With type.</p>"
-          }
-        ]
-      }
-    },
-    "type": "",
-    "url": "",
-    "version": "0.0.0",
-    "filename": "./doc/main.js",
-    "group": "C__Users_Jorge_Documents_repos_payments_service_doc_main_js",
-    "groupTitle": "C__Users_Jorge_Documents_repos_payments_service_doc_main_js",
-    "name": ""
-  },
-  {
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "optional": false,
-            "field": "varname1",
-            "description": "<p>No type.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "varname2",
-            "description": "<p>With type.</p>"
-          }
-        ]
-      }
-    },
-    "type": "",
-    "url": "",
-    "version": "0.0.0",
-    "filename": "./public/main.js",
-    "group": "C__Users_Jorge_Documents_repos_payments_service_public_main_js",
-    "groupTitle": "C__Users_Jorge_Documents_repos_payments_service_public_main_js",
-    "name": ""
-  },
-  {
     "type": "post",
     "url": "/v1/payments/:paymentId/cancel",
     "title": "Cancel Payment",
@@ -83,7 +27,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./app/domain/payments/routes.py",
+    "filename": "app/domain/payments/routes.py",
     "groupTitle": "Payments",
     "error": {
       "examples": [
@@ -138,7 +82,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./app/domain/payments/routes.py",
+    "filename": "app/domain/payments/routes.py",
     "groupTitle": "Payments",
     "error": {
       "examples": [
@@ -181,7 +125,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./app/domain/payments/routes.py",
+    "filename": "app/domain/payments/routes.py",
     "groupTitle": "Payments",
     "examples": [
       {
@@ -231,7 +175,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./app/domain/payments/routes.py",
+    "filename": "app/domain/payments/routes.py",
     "groupTitle": "Payments",
     "error": {
       "examples": [
@@ -267,7 +211,7 @@ define({ "api": [
       }
     ],
     "version": "0.0.0",
-    "filename": "./app/gateways/rabbit_service.py",
+    "filename": "app/gateways/rabbit_service.py",
     "groupTitle": "RabbitMQ_GET",
     "name": "DirectPaymentsTransaction_task_queue"
   },
@@ -285,7 +229,7 @@ define({ "api": [
       }
     ],
     "version": "0.0.0",
-    "filename": "./app/gateways/rabbit_service.py",
+    "filename": "app/gateways/rabbit_service.py",
     "groupTitle": "RabbitMQ_GET",
     "name": "FanoutAuthLogout"
   },
@@ -303,7 +247,7 @@ define({ "api": [
       }
     ],
     "version": "0.0.0",
-    "filename": "./app/gateways/rabbit_service.py",
+    "filename": "app/gateways/rabbit_service.py",
     "groupTitle": "RabbitMQ_GET_MOCK",
     "name": "FanoutPaymentsPaymentComplete"
   },
@@ -321,7 +265,7 @@ define({ "api": [
       }
     ],
     "version": "0.0.0",
-    "filename": "./app/gateways/rabbit_service.py",
+    "filename": "app/gateways/rabbit_service.py",
     "groupTitle": "RabbitMQ_GET_MOCK",
     "name": "FanoutPaymentsPaymentsFailed"
   },
@@ -339,7 +283,7 @@ define({ "api": [
       }
     ],
     "version": "0.0.0",
-    "filename": "./app/gateways/rabbit_service.py",
+    "filename": "app/gateways/rabbit_service.py",
     "groupTitle": "RabbitMQ_POST",
     "name": "FanoutPaymentsPaymentComplete"
   },
@@ -357,7 +301,7 @@ define({ "api": [
       }
     ],
     "version": "0.0.0",
-    "filename": "./app/gateways/rabbit_service.py",
+    "filename": "app/gateways/rabbit_service.py",
     "groupTitle": "RabbitMQ_POST",
     "name": "FanoutPaymentsPaymentsFailed"
   },
@@ -375,7 +319,7 @@ define({ "api": [
       }
     ],
     "version": "0.0.0",
-    "filename": "./app/gateways/rabbit_service.py",
+    "filename": "app/gateways/rabbit_service.py",
     "groupTitle": "RabbitMQ_POST",
     "name": "FanoutTransactionsTransaction_task_queue"
   }
